@@ -35,7 +35,6 @@ run_gen <- function(ancestors, size, run_gen.rule)
       }
     }
     x <- as.integer(run_gen.rule(run_gen.vals))
-    #print(x)
     run_gen.entity[run_gen.entity_ind] <- x
     ancestor_start_ind <- ancestor_start_ind + 1
     run_gen.entity_ind <- run_gen.entity_ind + 1
