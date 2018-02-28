@@ -5,8 +5,8 @@ account: duncan96
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 289803
-bundleId: 1244296
+bundleId: 1244304
 url: https://duncan96.shinyapps.io/CellulaR_Automata_Generator/
-when: 1519797740.47914
+when: 1519798324.37723
 asMultiple: FALSE
 asStatic: FALSE
