@@ -42,7 +42,7 @@ run_gen <- function(ancestors, size, run_gen.rule)
   return(run_gen.entity)
 }
 
-cellular_automata <- function(rule_num = 1, CA.cross_size = 11, CA.num_gen = 20)
+cellular_automata <- function(rule_num = 1, CA.cross_size = 11, CA.num_gen = floor(CA.cross_size/2), show = F)
 {
   CA.gen <- vector(mode = "integer", length = CA.cross_size)
   if(CA.cross_size %% 2 == 1)
@@ -58,9 +58,14 @@ cellular_automata <- function(rule_num = 1, CA.cross_size = 11, CA.num_gen = 20)
   for(CA.ind in 1:CA.num_gen)
   {
     CA.gen <- run_gen(CA.gen, size = 3, run_gen.rule = CA.rule)
-    CA.store <- c(CA.store, CA.gen)
+    CA.store <- c(CA.gen, CA.store)
   }
-  return(t(matrix(CA.store, ncol = (CA.num_gen+1), nrow = (CA.cross_size))))
+  ca <- t(matrix(CA.store, ncol = (CA.num_gen+1), nrow = (CA.cross_size)))
+  if(show)
+  {
+    image(1 - t(ca), col = topo.colors(2))
+  }
+  return(ca)
 }
 
 automata_rule <- function(automata_rule.rule_num) {
