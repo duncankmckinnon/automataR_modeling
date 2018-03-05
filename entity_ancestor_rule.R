@@ -44,8 +44,6 @@ cellular_automata <- function(rule_num = 1, CA.cross_size = 11, CA.num_gen = flo
   if(CA.cross_size %% 2 == 1)
   {
     CA.gen[floor(CA.cross_size/2) + 1] <- 1
-    CA.gen[floor(CA.cross_size/2)] <- 1 
-    CA.gen[floor(CA.cross_size/2) - 1] <- 1 
   }
   else
   {
