@@ -36,22 +36,26 @@ generation <- function(ancestors, size, generation.rule)
   return(generation.entity)
 }
 
-cellular_automata <- function(rule_num = 1, CA.cross_size = 11, CA.num_gen = floor(CA.cross_size/2), show = F)
+
+
+cellular_automata <- function(rule_num = 1, CA.cross_size = 11, CA.num_gen = floor(CA.cross_size/2), CA.e_size = 3, show = F)
 {
   CA.gen <- vector(mode = "integer", length = CA.cross_size)
   if(CA.cross_size %% 2 == 1)
   {
-    CA.gen[CA.cross_size/2 + 1] <- 1
+    CA.gen[floor(CA.cross_size/2) + 1] <- 1
+    CA.gen[floor(CA.cross_size/2)] <- 1 
+    CA.gen[floor(CA.cross_size/2) - 1] <- 1 
   }
   else
   {
     CA.gen[CA.cross_size/2] <- 1
   }
   CA.store <- c(CA.gen)
-  CA.rule <- automata_rule(rule_num)
+  CA.rule <- automata_rule(rule_num, size = CA.e_size)
   for(CA.ind in 1:CA.num_gen)
   {
-    CA.gen <- generation(CA.gen, size = 3, generation.rule = CA.rule)
+    CA.gen <- generation(CA.gen, size = CA.e_size, generation.rule = CA.rule)
     CA.store <- c(CA.gen, CA.store)
   }
   ca <- t(matrix(CA.store, ncol = (CA.num_gen+1), nrow = (CA.cross_size)))
@@ -62,9 +66,10 @@ cellular_automata <- function(rule_num = 1, CA.cross_size = 11, CA.num_gen = flo
   return(ca)
 }
 
-automata_rule <- function(automata_rule.rule_num) {
-  automata_rule.num_vec <- 0:7
-  automata_rule.binary <- vector(mode = "integer", length = 8)
+automata_rule <- function(automata_rule.rule_num, size = 3) {
+  n <- 2^size
+  automata_rule.num_vec <- 0:(n-1)
+  automata_rule.binary <- vector(mode = "integer", length = n)
   automata_rule.I2B <- int2binary(automata_rule.rule_num)
   automata_rule.binary[1:length(automata_rule.I2B)] <- automata_rule.I2B
   automata_rule.rule <- function(val)

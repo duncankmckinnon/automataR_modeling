@@ -9,10 +9,10 @@
 
 library(shiny)
 
-run_gen <- function(ancestors, size, run_gen.rule)
+generation <- function(ancestors, size, generation.rule)
 {
-  run_gen.entity <- vector(length = length(ancestors))
-  run_gen.entity_ind <- 1
+  generation.entity <- vector(length = length(ancestors))
+  generation.entity_ind <- 1
   ancestor_start_ind <- 0
   ancestor_end_ind <- ancestor_start_ind
   ancestor_loop_ind <- 1 
@@ -20,49 +20,51 @@ run_gen <- function(ancestors, size, run_gen.rule)
   {
     if(ancestor_start_ind < floor(size/2))
     {
-      run_gen.vals <- c(ancestors[(length(ancestors) - floor(size/2) + (ancestor_start_ind)):length(ancestors)], ancestors[1:(floor(size/2) + ancestor_start_ind)])
+      generation.vals <- c(ancestors[(length(ancestors) - floor(size/2) + (ancestor_start_ind)):length(ancestors)], ancestors[1:(floor(size/2) + ancestor_start_ind)])
     }
     else
     {
       ancestor_end_ind <- ancestor_start_ind + size - 1
       if(ancestor_end_ind > length(ancestors))
       {
-        run_gen.vals <- c(ancestors[ancestor_start_ind:length(ancestors)], ancestors[1:ancestor_loop_ind])
+        generation.vals <- c(ancestors[ancestor_start_ind:length(ancestors)], ancestors[1:ancestor_loop_ind])
         ancestor_loop_ind <- ancestor_loop_ind + 1
       }
       else if(ancestor_start_ind < ceiling(length(ancestors)))
       {
-        run_gen.vals <- ancestors[ancestor_start_ind:ancestor_end_ind]
+        generation.vals <- ancestors[ancestor_start_ind:ancestor_end_ind]
       }
       else
       {
-        return(run_gen.entity)
+        return(generation.entity)
       }
     }
-    x <- as.integer(run_gen.rule(run_gen.vals))
-    run_gen.entity[run_gen.entity_ind] <- x
+    x <- as.integer(generation.rule(generation.vals))
+    generation.entity[generation.entity_ind] <- x
     ancestor_start_ind <- ancestor_start_ind + 1
-    run_gen.entity_ind <- run_gen.entity_ind + 1
+    generation.entity_ind <- generation.entity_ind + 1
   }
-  return(run_gen.entity)
+  return(generation.entity)
 }
 
-cellular_automata <- function(rule_num = 1, CA.cross_size = 11, CA.num_gen = floor(CA.cross_size/2), show = F)
+
+
+cellular_automata <- function(rule_num = 1, CA.cross_size = 11, CA.num_gen = floor(CA.cross_size/2), CA.e_size = 3, show = F)
 {
   CA.gen <- vector(mode = "integer", length = CA.cross_size)
   if(CA.cross_size %% 2 == 1)
   {
-    CA.gen[CA.cross_size/2 + 1] <- 1
+    CA.gen[floor(CA.cross_size/2) + 1] <- 1
   }
   else
   {
     CA.gen[CA.cross_size/2] <- 1
   }
   CA.store <- c(CA.gen)
-  CA.rule <- automata_rule(rule_num)
+  CA.rule <- automata_rule(rule_num, size = CA.e_size)
   for(CA.ind in 1:CA.num_gen)
   {
-    CA.gen <- run_gen(CA.gen, size = 3, run_gen.rule = CA.rule)
+    CA.gen <- generation(CA.gen, size = CA.e_size, generation.rule = CA.rule)
     CA.store <- c(CA.gen, CA.store)
   }
   ca <- t(matrix(CA.store, ncol = (CA.num_gen+1), nrow = (CA.cross_size)))
@@ -73,9 +75,10 @@ cellular_automata <- function(rule_num = 1, CA.cross_size = 11, CA.num_gen = flo
   return(ca)
 }
 
-automata_rule <- function(automata_rule.rule_num) {
-  automata_rule.num_vec <- 0:7
-  automata_rule.binary <- vector(mode = "integer", length = 8)
+automata_rule <- function(automata_rule.rule_num, size = 3) {
+  n <- 2^size
+  automata_rule.num_vec <- 0:(n-1)
+  automata_rule.binary <- vector(mode = "integer", length = n)
   automata_rule.I2B <- int2binary(automata_rule.rule_num)
   automata_rule.binary[1:length(automata_rule.I2B)] <- automata_rule.I2B
   automata_rule.rule <- function(val)
@@ -122,8 +125,13 @@ ui <- fluidPage(
                       value = 30,
                       min = 1,
                       max = 256),
+         numericInput(inputId = "base",
+                     label = "Numeric Base",
+                     value = 3,
+                     min = 2,
+                     max = 13),
          sliderInput(inputId = "generations",
-                     label = "Number of Generations:",
+                     label = "Generations:",
                      min = 2,
                      max = 2001,
                      value = 51),
@@ -143,7 +151,7 @@ server <- function(input, output) {
    
    output$CA.Plot <- renderPlot({
       input$runbutton
-      x <- isolate(cellular_automata(rule_num = input$rulenum, CA.cross_size = input$generations, show = F))
+      x <- isolate(cellular_automata(rule_num = input$rulenum, CA.cross_size = input$generations, CA.e_size = input$base, show = F))
       image(1 - t(x), col = grey(seq(0, 1, length = 256)))
    })
 }
